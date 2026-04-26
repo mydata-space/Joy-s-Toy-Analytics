@@ -13,7 +13,8 @@ They call us for the expertise on the services below:
 - Conduct RMF to identify big spender and lost customer for marketing purposes.
 - Create power BI dashboard to track key sales perfromance.
 
-<img width="995" height="527" alt="Data Flow Chart" src="https://github.com/user-attachments/assets/42062e44-1236-4f3e-8fc3-4dedb6ffc78c" />
+<img width="1233" height="462" alt="Data Flow Chart" src="https://github.com/user-attachments/assets/b95fabc9-f304-4bb2-a0b3-e7e1e3e41cb2" />
+
 
 
 ## ✨ About Me 
