@@ -2,9 +2,9 @@ Joy's Toy Analytcis
 ---
   
 Joy's Toy is a children toys retailer. 
-Sector: Toy retail
-Country: Congo Republic, Brazzaville
-Data level maturity: stage 1
+- Sector: Toy retail
+- Country: Congo Republic, Brazzaville
+- Data level maturity: stage 1
 
 They call us for the expertise on the services below: 
 - Data analytics engineer (create a medalion data warehouse to process data and perform ELT using SQL server)
