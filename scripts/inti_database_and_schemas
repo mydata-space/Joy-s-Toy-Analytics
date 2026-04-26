@@ -1,0 +1,46 @@
+/*
+========================================================================
+	Create database and Schema :
+		This script create a database and chemas (bronze, silver and gold).
+		The script check if the database already exists before droping and 
+		creating the database.
+	Naming convention: snakecase
+	For instance: joydatawarehouse
+
+========================================================================
+*/
+
+-- CREATE DATABSE AND SCHEMAS 
+USE master; 
+GO 
+
+IF EXISTS(SELECT 1 FROM SYS.DATABASES WHERE NAME = 'joydatawarehouse')
+BEGIN
+	ALTER DATABASE joydatawarehouse SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+	DROP DATABASE joydatawarehouse;
+END
+CREATE DATABASE joydatawarehouse;
+GO 
+
+USE joydatawarehouse;
+GO 
+
+-- CREATE SHEMAS (bronze, silver and gold)
+CREATE SCHEMA bronze; 
+GO 
+
+CREATE SCHEMA silver;
+GO 
+
+CREATE SCHEMA gold; 
+GO 
+
+
+
+
+
+
+
+
+
+
