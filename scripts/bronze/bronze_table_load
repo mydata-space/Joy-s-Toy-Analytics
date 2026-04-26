@@ -1,0 +1,65 @@
+/*
+=======================================================
+=======================================================
+Bronze layer :
+	This script perform the 'E', it creates the table
+	bronze.salesdata then, extract and load data 
+	into this table using bulk insert.
+=======================================================
+=======================================================
+*/
+
+-- Create table bronze.salesdata
+IF OBJECT_ID('bronze.salesdata','U') IS NULL
+	DROP TABLE bronze.salesdata;
+CREATE TABLE bronze.salesdata
+(
+	ORDERNUMBER INT, 
+	QUANTITYORDERED INT,
+	PRICEEACH DECIMAL ,
+	ORDERLINENUMBER INT,
+	SALES DECIMAL, 
+	ORDERDATE DATETIME,
+	STATUS NVARCHAR(50),
+	QTR_ID INT,
+	MONTH_ID INT,
+	YEAR_ID INT,
+	PRODUCTLINE NVARCHAR(50),
+	MSRP INT,
+	PRODUCTCODE NVARCHAR(100),
+	CUSTOMERNAME NVARCHAR(100),
+	PHONE NVARCHAR(100),
+	ADDRESSLINE1 NVARCHAR(100),
+	ADDRESSLINE2 NVARCHAR(100), 
+	CITY NVARCHAR(100),
+	STATE NVARCHAR(100),
+	POSTALCODE NVARCHAR(100),
+	COUNTRY NVARCHAR(100),
+	TERRITORY NVARCHAR(100),
+	CONTACTLASTNAME NVARCHAR(100),
+	CONTACTFIRSTNAME NVARCHAR(100),
+	DEALSIZE NVARCHAR(100)
+);
+GO
+
+-- Load data into bronze.salesdata
+TRUNCATE TABLE bronze.salesdata;
+BULK INSERT bronze.salesdata
+FROM 'I:\MyPortforlio\01 Github Projects\02 Customer Segmentation RFM\salesdata.csv'
+WITH 
+(
+	FORMAT ='CSV',
+	FIRSTROW = 2,
+	FIELDQUOTE = '"',
+	TABLOCK 
+);
+GO 
+
+
+
+
+
+
+
+
+
