@@ -1,0 +1,102 @@
+/*
+=======================================================
+=======================================================
+Silver layer :
+	This script performs the 'T' and 'L", it transforms and clean 
+	data from bronze.salesdata table then create the table
+	silver.salesdata and load cleaned data.  
+=======================================================
+=======================================================
+*/
+
+-- Create table silver.salesdata
+IF OBJECT_ID('silver.salesdata', 'U') IS NULL
+	DROP TABLE silver.salesdata;
+CREATE TABLE silver.salesdata
+(
+	order_number INT, 
+	quantity INT,
+	price DECIMAL ,
+	orderline_number INT,
+	sales_amount DECIMAL, 
+	order_date DATETIME,
+	status NVARCHAR(50),
+	quarter_id INT,
+	month_id INT,
+	year_id INT,
+	product_line NVARCHAR(50),
+	manufacturer_price INT,
+	product_code NVARCHAR(100),
+	customer_name NVARCHAR(100),
+	phone_number NVARCHAR(100),
+	address1 NVARCHAR(100),
+	address2 NVARCHAR(100), 
+	city NVARCHAR(100),
+	state NVARCHAR(100),
+	postal_code NVARCHAR(100),
+	country NVARCHAR(100),
+	territory NVARCHAR(100),
+	conatact_lastname NVARCHAR(100),
+	contact_name NVARCHAR(100),
+	deal_size NVARCHAR(100)
+
+);
+
+INSERT INTO silver.salesdata
+(
+	order_number  , 
+	quantity  ,
+	price  ,
+	orderline_number  ,
+	sales_amount , 
+	order_date,
+	status ,
+	quarter_id  ,
+	month_id  ,
+	year_id  ,
+	product_line ,
+	manufacturer_price  ,
+	product_code ,
+	customer_name ,
+	phone_number ,
+	address1 ,
+	address2 , 
+	city ,
+	state ,
+	postal_code ,
+	country ,
+	territory ,
+	conatact_lastname ,
+	contact_name ,
+	deal_size 
+)
+SELECT 
+	ORDERNUMBER AS order_number, 
+	CASE WHEN QUANTITYORDERED < 0 THEN 0 ELSE QUANTITYORDERED END AS quantity,
+	CASE WHEN PRICEEACH < 0 THEN 0 ELSE PRICEEACH END AS price,
+	ORDERLINENUMBER AS orderline_number,
+	CASE 
+		WHEN SALES < 0 THEN 0 
+		WHEN SALES = PRICEEACH  * QUANTITYORDERED THEN SALES 
+		ELSE PRICEEACH  * QUANTITYORDERED END AS sales_amount, 
+	ORDERDATE AS order_date,
+	TRIM(STATUS) AS status,
+	QTR_ID AS quarter_id,
+	MONTH_ID month_id,
+	YEAR_ID AS year_id,
+	TRIM(PRODUCTLINE) AS product_line,
+	MSRP AS manufacturer_price,
+	TRIM(PRODUCTCODE) AS product_code,
+	TRIM(CUSTOMERNAME) AS custormer_name,
+	TRIM(PHONE) AS phone_number ,
+	TRIM(ADDRESSLINE1) AS address1,
+	TRIM(ADDRESSLINE2) AS address2, 
+	TRIM(CITY) AS city,
+	TRIM(STATE) AS states,
+	TRIM(POSTALCODE) AS postal_code ,
+	TRIM(COUNTRY) AS country,
+	TRIM(TERRITORY) AS territory ,
+	TRIM(CONTACTLASTNAME) AS conatact_lastname,
+	TRIM(CONTACTFIRSTNAME) AS contact_name,
+	TRIM(DEALSIZE) AS deal_size 
+FROM bronze.salesdata; 
