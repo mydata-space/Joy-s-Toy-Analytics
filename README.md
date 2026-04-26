@@ -16,4 +16,9 @@ They call us for the expertise on the services below:
 <img width="995" height="527" alt="Data Flow Chart" src="https://github.com/user-attachments/assets/42062e44-1236-4f3e-8fc3-4dedb6ffc78c" />
 
 
+## ✨ About Me 
+Hi there! I'm Christ GHABAKO, I'm an MBA of business analytics and entreprise information systems.
+My responsability is to help businesses to process, analyze and consume data efficiently and effectively. 
+Furthermore, I am SAP Finance and Controlling consultant.   
+
   
