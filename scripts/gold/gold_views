@@ -1,0 +1,77 @@
+/*
+=======================================================
+=======================================================
+gold layer :
+	This script create a start schema model.
+	create business tables ready to use for analysis.
+=======================================================
+=======================================================
+*/
+
+-- Business data view
+CREATE VIEW business_data AS
+SELECT order_number
+      ,quantity
+      ,price
+      ,orderline_number
+      ,sales_amount
+      ,order_date
+      ,status
+      ,product_line
+      ,manufacturer_price
+      ,product_code
+      ,customer_name
+      ,phone_number
+      ,address1 AS address
+      ,city
+      ,postal_code
+      ,country
+      ,territory
+      ,conatact_lastname
+      ,contact_name
+      ,deal_size
+FROM silver.salesdata
+
+/*
+CREATE VIEW fact_orders AS
+SELECT 
+    order_number ,
+    orderline_number,
+    quantity ,
+    price ,
+    sales_amount ,
+    order_date ,
+    quarter_id ,
+    month_id ,
+    year_id,
+    product_code,  -- FK to DimProduct
+    customer_name  -- FK to DimCustomer (or use customer_id if added)
+FROM silver.salesdata;
+
+CREATE VIEW dim_product AS
+SELECT
+    ROW_NUMBER() OVER(PARTITION BY product_code ORDER BY product_line) AS product_id,
+    product_code,
+    product_line,
+    manufacturer_price,
+    deal_size
+FROM silver.salesdata;
+
+CREATE VIEW dim_customer 
+SELECT
+    customer_name,
+    contact_name,
+    conatact_lastname ,
+    phone_number,
+    address1,
+    address2,
+    city,
+    state,
+    postal_code,
+    country,
+    territory
+FROM silver.salesdata;
+*/
+
+
+
