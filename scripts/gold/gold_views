@@ -52,7 +52,7 @@ SELECT
     manufacturer_price
 FROM dim_product
 
--- View fact_sales
+-- View gold.fact_sales
 CREATE VIEW fact_sales AS
 SELECT 
     s.order_number,
