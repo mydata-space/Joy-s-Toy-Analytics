@@ -1,77 +1,75 @@
 /*
-=======================================================
-=======================================================
+==============================================================
+==============================================================
 gold layer :
-	This script create a start schema model.
-	create business tables ready to use for analysis.
-=======================================================
-=======================================================
+	This script create business tables ready to use,
+	one fact_sales and two dimensions product and customer,
+respectively. 
+=============================================================
+=============================================================
 */
 
--- Business data view
-CREATE VIEW business_data AS
-SELECT order_number
-      ,quantity
-      ,price
-      ,orderline_number
-      ,sales_amount
-      ,order_date
-      ,status
-      ,product_line
-      ,manufacturer_price
-      ,product_code
-      ,customer_name
-      ,phone_number
-      ,address1 AS address
-      ,city
-      ,postal_code
-      ,country
-      ,territory
-      ,conatact_lastname
-      ,contact_name
-      ,deal_size
-FROM silver.salesdata
-
-/*
-CREATE VIEW fact_orders AS
-SELECT 
-    order_number ,
-    orderline_number,
-    quantity ,
-    price ,
-    sales_amount ,
-    order_date ,
-    quarter_id ,
-    month_id ,
-    year_id,
-    product_code,  -- FK to DimProduct
-    customer_name  -- FK to DimCustomer (or use customer_id if added)
-FROM silver.salesdata;
-
-CREATE VIEW dim_product AS
-SELECT
-    ROW_NUMBER() OVER(PARTITION BY product_code ORDER BY product_line) AS product_id,
-    product_code,
-    product_line,
-    manufacturer_price,
-    deal_size
-FROM silver.salesdata;
-
-CREATE VIEW dim_customer 
-SELECT
-    customer_name,
-    contact_name,
-    conatact_lastname ,
-    phone_number,
-    address1,
-    address2,
-    city,
-    state,
+-- Business data view: dim_product, dim_customer and fact_orders
+-- View gold.dim_customer
+CREATE VIEW gold.dim_customer AS
+WITH dim_customer AS(
+SELECT *, 
+ROW_NUMBER() OVER(ORDER BY customer_name) AS customer_id
+FROM(
+SELECT DISTINCT 
+    customer_name,     
     postal_code,
+    address1 AS address,
+    city,
     country,
     territory
-FROM silver.salesdata;
-*/
+FROM silver.salesdata) AS customer_data)
+SELECT 
+    customer_id,
+    customer_name,     
+    postal_code,
+    address,
+    city,
+    country,
+    territory
+FROM dim_customer ;
+
+-- View gold.dim_product
+CREATE View gold.dim_product AS
+WITH dim_product AS(
+SELECT *, 
+ROW_NUMBER() OVER(ORDER BY product_code) AS product_id
+FROM(
+SELECT DISTINCT 
+    product_code,
+    product_line,
+    manufacturer_price
+FROM silver.salesdata) AS product)
+SELECT 
+    product_id,
+    product_code,
+    product_line,
+    manufacturer_price
+FROM dim_product
+
+-- View fact_sales
+CREATE VIEW fact_sales AS
+SELECT 
+    s.order_number,
+    p.product_id,   
+    c.customer_id, 
+    s.orderline_number,
+    s.deal_size,
+    s.quantity ,
+    s.price ,
+    s.sales_amount,
+    s.order_date
+FROM silver.salesdata s
+LEFT JOIN gold.dim_product p ON s.product_code = p.product_code
+LEFT JOIN gold.dim_customer c ON s.customer_name = c.customer_name
+
+
+
 
 
 
