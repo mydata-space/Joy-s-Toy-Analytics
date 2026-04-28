@@ -1,0 +1,158 @@
+/*
+========================================================================
+    Data Exploratory, Advancd Analysis:
+
+    Data Exploratory:
+        This script identifies dimension and measure column
+        and patterns.
+
+    Advancd Analysis:
+        advanced data analytics drives deep business insights and
+        prepares the views for BI report. 
+
+========================================================================
+*/
+
+-- ----------------------------------------------------------
+-- Data Exploratory 
+-- ----------------------------------------------------------
+-- Unique values gold.dim_customers
+SELECT 'number of customer' AS Measure, COUNT(customer_id) AS Number FROM gold.dim_customer
+UNION ALL
+SELECT 'number of city', COUNT(DISTINCT city) FROM gold.dim_customer
+UNION ALL
+SELECT 'number of country', COUNT(DISTINCT country) FROM gold.dim_customer
+UNION ALL
+SELECT 'number of territory', COUNT(DISTINCT territory) FROM gold.dim_customer
+
+-- Unique values gold.dim_product
+SELECT 'number of product' AS Measure, COUNT(DISTINCT product_id) AS Number FROM gold.dim_product
+UNION ALL
+SELECT 'number of product_line' AS Measure, COUNT(DISTINCT product_line) AS Number FROM gold.dim_product
+UNION ALL
+SELECT 'average manufacturer_price' AS Measure, AVG(manufacturer_price) AS Number FROM gold.dim_product
+
+-- Unique values gold.fact_sales
+SELECT 'total order' AS Measure, COUNT(DISTINCT order_number) AS Number FROM gold.fact_sales
+UNION ALL
+SELECT 'average price' AS Measure, AVG(price) AS Number FROM gold.fact_sales
+UNION ALL
+SELECT 'average quantity' AS Measure, AVG(quantity) AS Number FROM gold.fact_sales
+UNION ALL
+SELECT 'total amount' AS Measure, SUM(sales_amount) AS Number FROM gold.fact_sales
+
+-- Number of customer by country
+SELECT
+COUNT(customer_id) AS 'number of customer', country
+-- city, territory
+FROM gold.dim_customer
+GROUP BY country -- territory, city
+ORDER BY 1 DESC 
+
+-- ----------------------------------------------------------
+-- Advanced Analysis 
+-- ----------------------------------------------------------
+
+-- Top city by revenue by country
+SELECT 
+country, city, 
+SUM(total_amount) OVER(PARTITION BY country ORDER BY city) AS 'total amount'
+FROM(
+SELECT
+country, city, SUM(sales_amount) AS 'total_amount'
+FROM gold.fact_sales s 
+LEFT JOIN gold.dim_customer c ON s.customer_id = c.customer_id
+GROUP BY country, city) T 
+WHERE country = 'USA'
+ORDER BY 1,3 DESC 
+
+-- Top product_line by revenue
+SELECT 
+DISTINCT product_line,
+SUM(sales_amount) AS 'total amount'
+FROM gold.fact_sales s
+LEFT JOIN gold.dim_product p ON s.product_id = p.product_id
+GROUP BY product_line
+ORDER BY 2 DESC
+
+-- Deal size by revenue
+SELECT 
+DISTINCT deal_size,
+SUM(sales_amount) AS 'total amount'
+FROM gold.fact_sales 
+GROUP BY deal_size
+ORDER BY 2 DESC
+
+-- Revenue by year
+SELECT 
+DATETRUNC(MONTH,order_date) AS 'best year',
+SUM(sales_amount) AS 'total amount'
+FROM gold.fact_sales 
+GROUP BY DATETRUNC(MONTH,order_date)
+ORDER BY 1,2 DESC
+
+-- Revenue runnning total by year and month
+WITH best_year_month AS(
+SELECT 
+YEAR(order_date) AS best_year,
+MONTH(order_date) AS best_month,
+SUM(sales_amount) AS total_amount
+FROM gold.fact_sales 
+GROUP BY YEAR(order_date), MONTH(order_date))
+SELECT 
+best_year, best_month,
+SUM(total_amount) OVER(PARTITION BY best_year ORDER BY best_month) AS 'total amount'
+FROM best_year_month
+ORDER BY 1,2,3
+
+-- Deal size contribution 
+SELECT 
+deal_size, total_amount,
+SUM(total_amount) OVER() AS 'global amount',
+total_amount * 100/SUM(total_amount) OVER() AS '%'
+FROM(
+SELECT 
+deal_size,SUM(sales_amount) AS total_amount
+FROM gold.fact_sales
+GROUP BY deal_size) T
+ORDER BY 2 DESC 
+
+-- Sales performance of product_line compare to the average
+WITH product_line_sales_performance AS(
+SELECT
+product_line,
+sales_amount AS total_amount,
+AVG(sales_amount) OVER()  AS avg_amount
+FROM(
+SELECT 
+product_line,
+SUM(sales_amount) AS sales_amount
+FROM gold.fact_sales s
+LEFT JOIN gold.dim_product p ON s.product_id = p.product_id
+GROUP BY product_line) T )
+SELECT p.*, CASE 
+WHEN total_amount > avg_amount THEN 'above'
+WHEN total_amount < avg_amount THEN 'below'
+ELSE 'average' END AS 'sales performance'
+FROM product_line_sales_performance p
+ORDER BY 2 DESC
+
+-- Compare crrent sales to previous year and month
+WITH sales_comparison AS(
+SELECT 
+YEAR(order_date) AS years, MONTH(order_date) AS months,
+SUM(sales_amount) AS sales_amount
+FROM gold.fact_sales
+GROUP BY YEAR(order_date), MONTH(order_date)), 
+sales_comparison_ AS(
+SELECT years,months,sales_amount,
+LAG(sales_amount) OVER(PARTITION BY years ORDER BY months) AS previous_amount
+FROM sales_comparison)
+SELECT s.*, CASE 
+WHEN previous_amount IS NULL THEN '-'
+WHEN sales_amount > previous_amount THEN 'increase'
+WHEN sales_amount < previous_amount THEN 'decrease'
+ELSE 'same' END AS decision 
+FROM sales_comparison_ s
+
+
