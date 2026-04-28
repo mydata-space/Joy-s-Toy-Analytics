@@ -1,0 +1,66 @@
+/*
+==================================================================
+	RFM Analysis:
+		This script performns recency, frequency and monetary 
+		ananlysis and segment customers based on their 
+		expending and amount and life span.
+==================================================================
+*/
+
+CREATE VIEW gold.rfm_analysis AS
+WITH rfm_retrievedata AS(
+SELECT
+c.customer_id, 
+COUNT (DISTINCT s.order_number) AS frequency,
+(SELECT MAX(order_date) FROM gold.fact_sales) AS last_date, 
+MAX(s.order_date) AS last_purchase,
+SUM(s.sales_amount) AS monetary
+FROM gold.fact_sales s 
+LEFT JOIN gold.dim_customer c ON s.customer_id = c.customer_id
+GROUP BY c.customer_id),
+rfm_analysis AS(
+SELECT
+customer_id,last_purchase,last_date, 
+DATEDIFF(MONTH,last_purchase,last_date) AS recency,
+frequency,monetary
+FROM rfm_retrievedata),
+rfm_totascore AS(
+SELECT ra.*,
+NTILE(4) OVER(ORDER BY recency DESC) AS r_score,
+NTILE(4) OVER(ORDER BY frequency ) AS f_score,
+NTILE(4) OVER(ORDER BY monetary ) AS m_score
+FROM rfm_analysis ra),
+rfm_segmentation AS(
+SELECT rts.*,
+CAST(r_score AS NVARCHAR) + CAST(f_score AS NVARCHAR) + CAST(m_score AS NVARCHAR) AS total_score
+FROM rfm_totascore rts)
+SELECT rs.*,CASE
+-- Champions (high recency + high frequency + high monetary)
+WHEN r_score IN (3,4) AND f_score IN (3,4) AND m_score IN (3,4) THEN 'Champions'
+-- Loyal (good recency + good frequency, medium-high monetary)
+WHEN r_score IN (3,4) AND f_score IN (2,3,4) AND m_score IN (2,3,4) THEN 'Loyal Customers'
+-- Potential (decent recency, low frequency but promising)
+WHEN r_score IN (3,4) AND f_score = 2 AND m_score = 2 THEN 'Potential'
+-- High Spenders (low or medium recency but high monetary)
+WHEN m_score IN (3,4) AND r_score IN (1,2) THEN 'High Spenders (At Risk)'
+-- At Risk (good past but not recent)
+WHEN r_score IN (1,2) AND f_score IN (3,4) AND m_score IN (3,4) THEN 'At Risk - Previously Loyal'
+-- Need Attention (low recency, medium everything else)
+WHEN r_score = 1 AND f_score IN (2,3) AND m_score IN (2,3)THEN 'Need Attention'
+-- New / Low Value (low on everything)
+WHEN r_score IN (2,3) AND f_score = 1 AND m_score = 1 THEN 'New Customers'
+-- Hibernating (cold, low frequency, low monetary)
+WHEN r_score = 1 AND f_score = 1 AND m_score = 1 THEN 'One-Time Shoppers'
+-- Lost (worst of all)
+WHEN r_score = 1 AND f_score = 1 AND m_score IN (1,2) THEN 'Lost'
+ELSE 'Regular' END AS spending_behavior_segment
+FROM rfm_segmentation rs
+
+
+ 
+
+
+
+
+
+
