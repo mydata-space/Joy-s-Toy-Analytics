@@ -22,7 +22,7 @@ SELECT DISTINCT
     address1 AS address,
     city,
     country,
-    territory
+    CASE WHEN territory = 'Japan' THEN 'APAC' ELSE territory END AS territory
 FROM silver.salesdata) AS customer_data)
 SELECT 
     customer_id,
@@ -53,7 +53,7 @@ SELECT
 FROM dim_product
 
 -- View gold.fact_sales
-CREATE VIEW fact_sales AS
+CREATE VIEW gold.fact_sales AS
 SELECT 
     s.order_number,
     p.product_id,   
@@ -63,7 +63,11 @@ SELECT
     s.quantity ,
     s.price ,
     s.sales_amount,
-    s.order_date
+    CASE 
+        WHEN s.order_date LIKE '2003%' THEN REPLACE (s.order_date, 2003, 2023)
+        WHEN s.order_date LIKE '2004%' THEN REPLACE (s.order_date, 2004, 2024)
+        WHEN s.order_date LIKE '2005%' THEN REPLACE (s.order_date, 2005, 2025)
+    END AS order_date
 FROM silver.salesdata s
 LEFT JOIN gold.dim_product p ON s.product_code = p.product_code
 LEFT JOIN gold.dim_customer c ON s.customer_name = c.customer_name
