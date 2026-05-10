@@ -18,8 +18,7 @@ They call us for the expertise on the services below:
 
 
 ## ✨ About Me 
-Hi there! I'm GHABAKO, data freelance and information system specialist and a graduate of an MBA in business analytics and information systems.
+Hi there! I'm GHABAKO, data freelance and information system specialist(SAP Finance and Controlling consultant).
 My responsability is to help businesses to process, analyze and consume data efficiently and effectively. 
-Furthermore, I am SAP Finance and Controlling consultant.   
 
   
