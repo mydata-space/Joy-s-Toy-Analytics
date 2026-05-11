@@ -15,6 +15,7 @@ They call us for the expertise on the services below:
 
 <img width="1233" height="462" alt="Data Flow Chart" src="https://github.com/user-attachments/assets/b95fabc9-f304-4bb2-a0b3-e7e1e3e41cb2" />
 
+<img width="935" height="391" alt="power bi summary " src="https://github.com/user-attachments/assets/7ae344a7-6e55-433d-9d19-c2dfef16ab64" />
 
 
 ## ✨ About Me 
