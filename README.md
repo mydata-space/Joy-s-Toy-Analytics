@@ -17,6 +17,8 @@ They call us for the expertise on the services below:
 
 <img width="935" height="391" alt="power bi summary " src="https://github.com/user-attachments/assets/7ae344a7-6e55-433d-9d19-c2dfef16ab64" />
 
+<img width="1197" height="672" alt="RFM ANALYSIS" src="https://github.com/user-attachments/assets/80a649e8-e10a-4612-b3a5-d5ea53e4702d" />
+
 
 ## ✨ About Me 
 Hi there! I'm GHABAKO, data freelance and information system specialist(SAP Finance and Controlling consultant).
